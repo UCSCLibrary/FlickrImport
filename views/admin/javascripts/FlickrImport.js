@@ -73,4 +73,12 @@ jQuery( document ).ready(function(){
 	parseURL(jQuery("#flickr-url").val());
     });
 
+    jQuery('#flickr-single-radio').click(function(){
+	jQuery('#flickr-select-div').hide(400);
+    });
+
+    jQuery('#flickr-multiple-radio').click(function(){
+	jQuery('#flickr-select-div').show(400);
+    });
+
 });

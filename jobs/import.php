@@ -14,7 +14,7 @@
 //class FlickrImport_ImportJob
 class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 {
-  private static $flickr_api_key = 'a664b4fdddb9e009f43e8a6012b1a392';
+  public static $flickr_api_key = 'a664b4fdddb9e009f43e8a6012b1a392';
   private $url;
   private $type;
   private $setID;
@@ -138,10 +138,10 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     return $ids;
   }
 
-  private function _getPhotoFiles($itemID)
+  public static function GetPhotoFiles($itemID,$f)
   {
 
-    $sizes = $this->f->photos_getSizes($itemID);
+    $sizes = $f->photos_getSizes($itemID);
     $files = array();
     $i=0;
     foreach($sizes as $file)
@@ -157,16 +157,16 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
   }
 
 
-  private function _getPhotoPost($itemID)
+  public static function GetPhotoPost($itemID,$f,$collection=0,$ownerRole=0,$public=0)
   {
-    $response = $this->f->photos_getInfo($itemID);
+    $response = $f->photos_getInfo($itemID);
     if($response['stat']=="ok")
       $photoInfo = $response['photo'];
     else
       die("Error retrieving info from Flickr: ".$response['stat']);
 
     $licenses=array();
-    $licenseArray = $this->f->photos_licenses_getInfo();
+    $licenseArray = $f->photos_licenses_getInfo();
     foreach($licenseArray as $license)
       {
 	$licenses[$license['id']]=$license['name'];
@@ -202,28 +202,31 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 		  7=>array($photoInfo['originalformat'])
 		  );
 
-    if($this->ownerRole > 0)
+    if($ownerRole > 0)
       {
         if($photoInfo['owner']['realname']!="")
-	  $maps[$this->ownerRole] = $photoInfo['owner']['realname'];
+	  $maps[$ownerRole] = array("Name: ".$photoInfo['owner']['realname'].'  Flickr username: '.$photoInfo['owner']['username']);
 	else
-	  $maps[$this->ownerRole] = $photoInfo['owner']['username'];
-
+	  $maps[$ownerRole] = array('Flickr username: '.$photoInfo['owner']['username']);
+	
       }
+    //print_r($maps);
+    //die();
       
     $Elements = array();
     foreach ($maps as $elementID => $elementTexts)
       {
 	foreach($elementTexts as $elementText)
 	  {
+	    $text = $elementText;
+
+	    //check for html tags
 	    if($elementText != strip_tags($elementText)) {
 	      //element text has html tags
-	      $text = "";
-	      $html = $elementText;
+	      $html = "1";
 	    }else {
 	      //plain text or other non-html object
-	      $html = "";
-	      $text = $elementText;
+	      $html = "0";
 	    }
 
 	    $Elements[$elementID] = array(array(
@@ -247,9 +250,9 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 			 'item_type_id'=>'6',      //a still image
 			 'tags-to-add'=>$tags,
 			 'tags-to-delete'=>'',
-			 'collection_id'=>$this->collection
+			 'collection_id'=>$collection
 			 );
-    if($this->public)
+    if($public)
       $returnArray['public']="1";
 
     return($returnArray );
@@ -324,9 +327,9 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 
   private function _addPhoto($itemID)
   {
-    $post = $this->_getPhotoPost($itemID);
+    $post = self::GetPhotoPost($itemID,$this->f,$this->collection,$this->ownerRole,$this->public);
       
-    $files = $this->_getPhotoFiles($itemID);
+    $files = self::GetPhotoFiles($itemID);
 
     $record = new Item();
 
