@@ -164,13 +164,13 @@ class FlickrImport_IndexController extends Omeka_Controller_AbstractActionContro
   private function _getFormCollectionOptions()
   {
     $collections = get_records('Collection',array(),'0');
-    $options = array('0'=>'Create New Collection');
-    $options = array('-1'=>'No Collection');
+    $options = array('0'=>'Create New Collection' );
     foreach ($collections as $collection)
       {
-	if(isset($collection->getElementTexts('Dublin Core','Title')[0]))
+	$titles =$collection->getElementTexts('Dublin Core','Title');
+	if(isset($titles[0]))
 	  {
-	    $title = $collection->getElementTexts('Dublin Core','Title')[0];
+	    $title = $titles[0];
 	    $options[$collection->id]=$title;
 	  }
       }
