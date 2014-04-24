@@ -148,7 +148,7 @@ class FlickrImport_IndexController extends Omeka_Controller_AbstractActionContro
     } else {
       error_log($record->getErrors());
     }
-    
+
     insert_files_for_item($record,'Url',$files);
 
     $flashMessenger = $this->_helper->FlashMessenger;
@@ -165,6 +165,7 @@ class FlickrImport_IndexController extends Omeka_Controller_AbstractActionContro
   {
     $collections = get_records('Collection',array(),'0');
     $options = array('0'=>'Create New Collection');
+    $options = array('-1'=>'No Collection');
     foreach ($collections as $collection)
       {
 	if(isset($collection->getElementTexts('Dublin Core','Title')[0]))

@@ -81,4 +81,11 @@ jQuery( document ).ready(function(){
 	jQuery('#flickr-select-div').show(400);
     });
 
+    jQuery('#flickr-url').change(function(){
+	var number = jQuery('input[name="flickr-number"]:checked').val();
+	var selecting = jQuery('input[name="flickr-selecting"]:checked').val();
+	if(number == "multiple" && selecting == "true")
+	    parseURL(jQuery("#flickr-url").val());
+    });
+
 });
