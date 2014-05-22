@@ -70,7 +70,7 @@ if(!isset($this->collection))
 </div>
 <div id="flickr-public-div" class="inputs five columns alpha">
 <input type="checkbox" name="flickr-public" value="1" checked="checked"/>
-<p class="explanation"><?php echo __( 'Pleas indicate whether you would like the new items to be public.' ); ?></p>
+<p class="explanation"><?php echo __( 'Pleas3 indicate whether you would like the new items to be public.' ); ?></p>
 </div>
 </div>
 

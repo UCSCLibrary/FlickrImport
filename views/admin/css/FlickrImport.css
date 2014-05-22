@@ -22,3 +22,8 @@
     min-width: 120px;
     overflow: hidden;
 }
+
+#flickrimportsubmit {
+clear:both;
+display:block;
+}

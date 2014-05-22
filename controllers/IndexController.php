@@ -14,194 +14,75 @@
 class FlickrImport_IndexController extends Omeka_Controller_AbstractActionController
 {    
  
-
+/**
+ * The default action to display the import from and process it.
+ *
+ * This action runs before loading the main import form. It 
+ * processes the form output if there is any, and populates
+ * some variables used by the form.
+ *
+ * @param void
+ * @return void
+ */
   public function indexAction()
   {
-    if(isset($_REQUEST['flickr-import-submit']) )
-      {
-	if(isset($_REQUEST['flickr-number']) && $_REQUEST['flickr-number']=='single')
-	  $this->_importSingle();
+    include_once(dirname(dirname(__FILE__))."/forms/ImportForm.php");
+    $form = new Flickr_Form_Import();
 
-	if(isset($_REQUEST['flickr-number']) && $_REQUEST['flickr-number']=='multiple')
-	  $this->_importMultiple();
+    //initialize flash messenger for success or fail messages
+    $flashMessenger = $this->_helper->FlashMessenger;
+    try{
+      if ($this->getRequest()->isPost()){
+	if($form->isValid($this->getRequest()->getPost()))
+	  $successMessage = Flickr_Form_Import::ProcessPost();
+	else 
+	  $flashMessenger->addMessage('Invalid Flickr photo data! Check your form entries.','error');
+      } 
+    } catch (Exception $e){
+      $flashMessenger->addMessage($e->getMessage(),'error');
+    }
 
-      }
+    $backgroundErrors = unserialize(get_option('flickrBackgroundErrors'));
+    if(is_array($backgroundErrors))
+      foreach($backgroundErrors as $backgroundError)
+	{
+	  $flashMessenger->addMessage($backgroundError,'error');
+	}
+    set_option('flickrBackgroundErrors',"");
 
-    $this->view->form_collection_options = $this->_getFormCollectionOptions();
-    $this->view->form_userrole_options = $this->_getFormUserRoleOptions();
-
+    if(isset($successMessage))
+      $flashMessenger->addMessage($successMessage,'success');
+    $this->view->form = $form;
       
   }
 
-  
-  private function _importMultiple()
+/**
+   * An action called by the background import job to log errors
+   * for later display.
+   *
+   * @param void
+   * @return void
+   */
+  public function errorAction()
   {
-     require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'jobs' . DIRECTORY_SEPARATOR . 'import.php';
-
-    if(isset($_REQUEST['flickr-url']))
-      $url = $_REQUEST['flickr-url'];
-    else
-      die("ERROR WITH PHOTOSET ID POST VAR");
-
-    $type = $this->_getType($_REQUEST['flickr-url']);
-
-    if(isset($_REQUEST['flickr-collection']))
-      $collection = $_REQUEST['flickr-collection'];
-    else
-      $collection = 0;
-
-    //this is not yet implemented in the view or javascript
-    if(isset($_REQUEST['flickr-selecting'])&&$_REQUEST['flickr-selecting']=="true")
-      {
-	$selecting = true;
-	$selected = $_REQUEST['flickr-selected'];
-      } 
-    else 
-      {
-	$selecting = false;
-	$selected = array();
-      }
-
-    if(isset($_REQUEST['flickr-public']))
-      $public = $_REQUEST['flickr-public'];
-    else 
-      $public = false;
-
-
-    if(isset($_REQUEST['flickr-userrole']))
-      $userRole = $_REQUEST['flickr-userrole'];
-    else
-      $userRole = 0;
-
-    $options = array(
-		     'url'=>$url,
-		     'type'=>$type,
-		     'collection'=>$collection,
-		     'selecting'=>$selecting,
-		     'selected'=>$selected,
-		     'public'=>$public,
-		     'userRole'=>$userRole
-		     );
-
-   
-
-    //(new FlickrImport_ImportJob)->perform();
-
-    $dispacher = Zend_Registry::get('job_dispatcher');
-
-    $dispacher->sendLongRunning('FlickrImport_ImportJob',$options);
-    //Zend_Registry::get('bootstrap')->getResource('jobs')->sendLongRunning('FlickrImport_ImportJob',);
-
-    $flashMessenger = $this->_helper->FlashMessenger;
-    $flashMessenger->addMessage('Your Flickr photoset is now being imported. This process may take a few minutes. You may continue to work while the photos are imported in the background. You may notice some strange behavior while the photos are uploading, but it will all be over soon.',"success");
- 
+    $errors = unserialize(get_option('flickrBackgroundError'));
+    $errors[] = $this->_getParam('error');
+    set_option('flickrBackgroundError',serialize($errors));
   }
 
-
-
-  private function _importSingle()
-  {
-    require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'jobs' . DIRECTORY_SEPARATOR . 'import.php';
-    require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR . 'phpFlickr' . DIRECTORY_SEPARATOR . 'phpFlickr.php';
-
-    $f = new phpFlickr(FlickrImport_ImportJob::$flickr_api_key);
-
-    if(isset($_REQUEST['flickr-url']))
-      $url = $_REQUEST['flickr-url'];
-    else
-      die("ERROR WITH PHOTOSET ID POST VAR");
-
-    $expUrl = explode("/",$url);
-
-    if(count($expUrl)>1)
-      $photoID = $expUrl[5];
-    else
-      $photoID = $url;
-
-    $type = $this->_getType($_REQUEST['flickr-url']);
-
-    if(isset($_REQUEST['flickr-collection']))
-      $collection = $_REQUEST['flickr-collection'];
-    else
-      $collection = 0;
-
-    if(isset($_REQUEST['flickr-public']))
-      $public = $_REQUEST['flickr-public'];
-    else 
-      $public = false;
-
-    if(isset($_REQUEST['flickr-userrole']))
-      $userRole = $_REQUEST['flickr-userrole'];
-    else
-      $userRole = 0;
-
-    $post = FlickrImport_ImportJob::GetPhotoPost($photoID,$f,$collection,$userRole,$public);
-
-    $files = FlickrImport_ImportJob::GetPhotoFiles($photoID,$f);
-
-    $record = new Item();
-
-    $record->setPostData($post);
-
-    if ($record->save(false)) {
-      // Succeed silently, since we're in the background	
-    } else {
-      error_log($record->getErrors());
-    }
-
-    insert_files_for_item($record,'Url',$files);
-
-    $flashMessenger = $this->_helper->FlashMessenger;
-    $flashMessenger->addMessage('Your image was imported into Omeka successfully','success');
-
-  }
 
   /**
-   * Get an array to be used in formSelect() containing all collections.
-   * 
-   * @return array
+   * Log error from background job into error option
+   *
+   * @param string $errorString An error message supplied by the 
+   * background job.
+   * @return void
    */
-  private function _getFormCollectionOptions()
+  private function _handleBackgroundError($errorString)
   {
-    $collections = get_records('Collection',array(),'0');
-    $options = array('0'=>'Create New Collection' );
-    foreach ($collections as $collection)
-      {
-	$titles =$collection->getElementTexts('Dublin Core','Title');
-	if(isset($titles[0]))
-	  {
-	    $title = $titles[0];
-	    $options[$collection->id]=$title;
-	  }
-      }
-    return $options;
-  }
-
-  /**
-   * Get an array to be used in formSelect() containing possible roles for users.
-   * 
-   * @return array
-   */
-  private function _getFormUserRoleOptions()
-  {
-    $options = array(
-		     '0'=>'No Role',
-		     '37'=>'Contributor',
-		     '39'=>'Creator',
-		     '45'=>'Publisher'
-		     );
-    return $options;
-  }
-
-  private function _getType($url)
-  {
-    $rv="";
-    if (strpos($url, 'sets'))
-      $rv="photoset";
-    else if (strpos($url,'galleries'))
-      $rv="gallery";
-
-    return $rv;
+    $errors = unserialize(get_option('flickrBackgroundError'));
+    $errors[]=$errorString;
+    set_option('flickrBackgroundError',serialize($errors));
   }
 
 }

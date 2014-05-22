@@ -2,22 +2,20 @@
 /**
  * Flickr plugin
  *
+ * @package     FlickrImport
  * @copyright Copyright 2014 UCSC Library Digital Initiatives
  * @license http://www.gnu.org/licenses/gpl-3.0.txt GNU GPLv3
  */
 
-//require_once dirname(__FILE__) . '/helpers/SedMetaFunctions.php';
-
 /**
- * FlickrImport plugin.
+ * FlickrImport plugin class
  */
 class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
 {
-    /**
-     * @var array Hooks for the plugin.
-     */
-    //protected $_hooks = array('admin_head');
-  protected $_hooks = array('initialize','define_acl','admin_head');
+  /**
+   * @var array Hooks for the plugin.
+   */
+  protected $_hooks = array('install','uninstall','initialize','define_acl','admin_head');
 
   /**
    * @var array Filters for the plugin.
@@ -27,14 +25,50 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
   /**
    * @var array Options and their default values.
    */
-  protected $_options = array();
+  protected $_options = array(
+			      'flickrBackgroundErrors' => ''
+			      );
 
+  /**
+   * Queue the javascript and css files to help the form work.
+   *
+   * @return void
+   */
   public function hookInitialize()
   {
     require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'jobs' . DIRECTORY_SEPARATOR . 'import.php';
   }
 
+  /**
+   * Install the options
+   *
+   * @return void
+   */
+  public function hookInstall()
+  {
+    $this->_installOptions();
+  }
 
+  /**
+   * Uninstall the options
+   *
+   * @return void
+   */
+  public function hookUninstall()
+  {
+    $this->_uninstallOptions();
+  }
+
+
+  /**
+   * Queue the javascript and css files to help the form work.
+   *
+   * This function runs before the admin section of the sit loads.
+   * It queues the javascript and css files which help the form work,
+   * so that they are loaded before any html output.
+   *
+   * @return void
+   */
   public function hookAdminHead()
   {
     queue_js_file('FlickrImport');
@@ -45,6 +79,10 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
 
   /**
    * Define the plugin's access control list.
+   *
+   * @param array $args This array contains a reference to
+   * the zend ACL under it's 'acl' key.
+   * @return void
    */
   public function hookDefineAcl($args)
   {
@@ -55,8 +93,8 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
   /**
    * Add the SedMeta link to the admin main navigation.
    * 
-   * @param array Navigation array.
-   * @return array Filtered navigation array.
+   * @param array $navigation Array of links for admin nav section
+   * @return array $filtered Updated array of links for admin nav section
    */
   public function filterAdminNavigationMain($nav)
   {
@@ -69,10 +107,5 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
     return $nav;
   }
 
-    private function _getUrl($urlstring)
-    {
-      $self = $_SERVER['PHP_SELF'];
-      return $self.$urlstring;
-    }
     
 }
