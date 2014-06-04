@@ -7,6 +7,8 @@
 */
 function parseURL(url){
 
+    url = resolveShortUrl(url);
+
     var setSplit = url.split("sets");
     var galSplit = url.split("galler");
 
@@ -80,7 +82,7 @@ function addPhoto(photos,i){
 
     var urlBase = "https://api.flickr.com/services/rest/?api_key=a664b4fdddb9e009f43e8a6012b1a392&format=json&jsoncallback=?&method=flickr.photos.getSizes&photo_id=";
 
-    var htmlBegin = '<div class="previewPicDiv"><input type="checkbox" name="flickr-selected['+photos[i].id+']" class="previewCheck" checked="checked"/><img class="previewPic" src="';
+    var htmlBegin = '<div class="previewPicDiv"><input type="checkbox" name="flickr-selected['+photos[i].id+']" class="previewCheck" /><img class="previewPic" src="';
     var htmlMiddle = '" ><label class="previewLabel">';
     var htmlEnd = "</previewLabel></div>";
 
@@ -104,10 +106,23 @@ function validFlickrUrl(url){
     var regexp = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
     if(!regexp.test(url))
 	return false;
-    if(url.indexOf("flickr.com")<0)
+    if(url.indexOf("flickr.com")<0 && url.indexOf("flic.kr")<0)
 	return false;
     return true;
 }
+
+
+/*
+*This function resolves short flickr URLs so that preview images can be 
+*generated
+*/
+function resolveShortUrl(url){
+    if(url.indexOf("flic.kr")<0)
+	return url;
+    
+
+}
+
 
 //Interface functions
 jQuery( document ).ready(function(){
@@ -123,7 +138,22 @@ jQuery( document ).ready(function(){
 	}
 	jQuery('#previewThumbs').html('');
 	jQuery('#previewThumbs').show();
-	jQuery('#previewThumbs').append('<input type="hidden" name="flickr-selecting" value="true"/>');
+	jQuery('#previewThumbs').append('<input type="hidden" name="flickr-selecting" value="true"/><div id="previewSelectButtons"><button id="previewSelectAll">Select All</button><button id="previewDeselectAll">Deselect All</button></div>');
+
+	jQuery('#previewSelectAll').click(function(event){
+	    event.preventDefault();
+	    jQuery('.previewCheck').each(function() {
+		jQuery(this).prop('checked','checked');
+	    });
+	});
+
+	jQuery('#previewDeselectAll').click(function(event){
+	    event.preventDefault();
+	    jQuery('.previewCheck').each(function() {
+		jQuery(this).prop('checked',false);
+	    });
+	});
+
 	parseURL(url);
     });
 

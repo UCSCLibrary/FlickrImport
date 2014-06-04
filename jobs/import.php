@@ -108,7 +108,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
       {
 	try{
 	  if(!$this->selecting || isset($this->selected[$photoID]))
-	    $items[] = $this->_addPhoto($photoID);
+	    $this->_addPhoto($photoID);
 	  echo("photo added:".$photoID);
 	} catch (Exception $e) {
 	  $errorIDs[]=$photoID;
@@ -363,6 +363,9 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     else
       throw new Exception("Unable to retrieve photo info from Flickr. Please check your url. We asked for photo ID $itemID and flickr responded: ".$response['stat']);
 
+    if(isset($photoInfo['media']) && $photoInfo['media']=='video')
+       return('video');
+
     $licenses=array();
     $licenseArray = $f->photos_licenses_getInfo();
     foreach($licenseArray as $license)
@@ -591,6 +594,9 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
       throw $e;
     }
 
+    if(!is_array($post) && $post=='video')
+      return 'video';
+
     $record = new Item();
 
     $record->setPostData($post);
@@ -604,8 +610,6 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     }catch(Exception $e){
       throw $e;
     }
-
-    //TODO: create derivative images
 
   }
 

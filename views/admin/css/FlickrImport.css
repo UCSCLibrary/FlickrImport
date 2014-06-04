@@ -12,6 +12,10 @@
     margin:5px
 }
 
+#previewSelectButtons {
+    display:block;
+}
+
 #previewThumbs {
     border: 1pm solid black;
 }
