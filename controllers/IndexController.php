@@ -65,24 +65,9 @@ class FlickrImport_IndexController extends Omeka_Controller_AbstractActionContro
    */
   public function errorAction()
   {
-    $errors = unserialize(get_option('flickrBackgroundError'));
+    $errors = unserialize(get_option('flickrBackgroundErrors'));
     $errors[] = $this->_getParam('error');
-    set_option('flickrBackgroundError',serialize($errors));
-  }
-
-
-  /**
-   * Log error from background job into error option
-   *
-   * @param string $errorString An error message supplied by the 
-   * background job.
-   * @return void
-   */
-  private function _handleBackgroundError($errorString)
-  {
-    $errors = unserialize(get_option('flickrBackgroundError'));
-    $errors[]=$errorString;
-    set_option('flickrBackgroundError',serialize($errors));
+    set_option('flickrBackgroundErrors',serialize($errors));
   }
 
 }
