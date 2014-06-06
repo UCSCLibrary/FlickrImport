@@ -88,20 +88,20 @@ class Flickr_Form_Import extends Omeka_Form
 
 	// User Role:
         $this->addElement('select', 'flickruserrole', array(
-								'label'         => __('User Role'),
-								'description'   => __('Which role does the Flickr user play in the creation of the new Omeka item?'),
-								'value'         => 'Contributor',
-								'order'         => 5,
+		           'label'         => __('Responsibility'),
+			   'description'   => __('The Flickr user is the ____ of the image(s)'),
+			   'value'         => 'Contributor',
+			   'order'         => 5,
 								
-								'multiOptions'       => $this->_getRoleOptions()
+			   'multiOptions'       => $this->_getRoleOptions()
 								)
 			  );
 
 
         // Visibility (public vs private):
         $this->addElement('checkbox', 'flickrpublic', array(
-            'label'         => __('Public Visibility'),
-            'description'   => __('Please indicate whether you would like the new items to be public.'),
+            'label'         => __('Privacy'),
+            'description'   => __('Please indicate whether you would like the new items to be publicly viewable on your Omeka site.'),
             'checked'         => 'checked',
 	    'order'         => 6
 							      )

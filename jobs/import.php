@@ -124,7 +124,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 
   }
 
-  /*
+  /**
    *Set the Flickr url
    *
    *@param string $url URL of Flickr photo, photoset, gallery, or photostream
@@ -135,7 +135,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     $this->url = $url;
   }
 
-  /*
+  /**
    *Set the collection ID
    *
    *@param string $collection The collection ID of the collection to which 
@@ -147,7 +147,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     $this->collection = $collection;
   }
 
-  /*
+  /**
    *Set the selected array
    *
    *@param array $selected An array containing the photoIDs of Flickr 
@@ -159,7 +159,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     $this->selected = $selected;
   }
 
-  /*
+  /**
    *Set the selecting property
    *
    *@param boolean $selecting Indicates whether individual photos are being
@@ -171,7 +171,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     $this->selecting = $selecting;
   }
 
-  /*
+  /**
    *Set the public property
    *
    *@param boolean $public Indicates whether the new omeka item or items
@@ -183,7 +183,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     $this->public = $public;
   }
 
-  /*
+  /**
    *Set the role property
    *
    *@param string $role String containing the name of the Dublin Core element
@@ -195,7 +195,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     $this->ownerRole = $role;
   }
 
-  /*
+  /**
    *Set the type property
    *
    *@param string $type The type of flickr collection. Allowed values
@@ -207,7 +207,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     $this->type = $type;
   }
 
-  /*
+  /**
    *Parse the Flickr url parameter 
    *
    *@return $string $setID A unique identifier for the Flickr collection
@@ -235,7 +235,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     return($setID);
   }
 
-  /*
+  /**
    *Retrieve the IDs of the photos in a Flickr collection
    *
    *@return array $photoIds An array of strings corresponding to
@@ -309,7 +309,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     return $ids;
   }
 
-  /*
+  /**
    *Retrieve the files associated with a given Flickr photo
    *
    *@param string $itemID The Flickr photo ID from which to extract metadata
@@ -338,7 +338,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
   }
 
 
-  /*
+  /**
    *Fetch metadata from a Flickr photo and prepare it
    *
    *@param string $itemID The Flickr photo ID from which to extract metadata
@@ -346,7 +346,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
    *@param int $collection The ID of the collection to which to add the new item
    *@param string $ownerRole The name of the dublin core field to which to 
    *add the new omeka item or items
-   *@param boolean public Indicates whether the new omeka item should be public
+   *@param boolean $public Indicates whether the new omeka item should be public
    *@return array $post An array containing metadata associated with the 
    *given Flickr photo in the correct format to save as an omeka item
    */
@@ -477,7 +477,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
   }
 
 
-  /*
+  /**
    *Create a new Omeka collection from a Flickr collection
    *
    *@param string $setID A unique identifier for the Flickr collection
@@ -487,7 +487,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
    *@param int $collection The ID of the collection to which to add the new item
    *@param string $ownerRole The name of the dublin core field to which to 
    *add the new omeka item or items
-   *@param boolean public Indicates whether the new omeka item should be public
+   *@param boolean $public Indicates whether the new omeka item should be public
    *@return int $id The collection ID of the newly created Omeka collection
    */
   public static function MakeDuplicateCollection($setID,$type='unknown',$f,$ownerRole=0,$public=1)
@@ -578,7 +578,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 
   }
 
-  /*
+  /**
    * Create a new Omeka item with information from a Flickr image
    *
    *@param string $itemID The Flickr photo ID of the photo to be added
@@ -613,7 +613,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 
   }
 
-  /*
+  /**
    *Send an error from the background process into Omeka for future display
    *
    *This function asynchronously calls an error logging script which 

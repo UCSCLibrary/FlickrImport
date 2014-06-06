@@ -93,8 +93,8 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
   /**
    * Add the SedMeta link to the admin main navigation.
    * 
-   * @param array $navigation Array of links for admin nav section
-   * @return array $filtered Updated array of links for admin nav section
+   * @param array $nav Array of links for admin nav section
+   * @return array $nav Updated array of links for admin nav section
    */
   public function filterAdminNavigationMain($nav)
   {

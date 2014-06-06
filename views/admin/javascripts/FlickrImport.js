@@ -119,8 +119,6 @@ function validFlickrUrl(url){
 function resolveShortUrl(url){
     if(url.indexOf("flic.kr")<0)
 	return url;
-    
-
 }
 
 
@@ -197,5 +195,7 @@ jQuery( document ).ready(function(){
     var radios = jQuery('input[name="flickrselecting"]:checked');
     if(radios.val()=='true')
 	jQuery('#flickrselecting-false').prop("checked",true);
+
+    jQuery('#flickrnumber-single').click();
 });
 
