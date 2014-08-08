@@ -15,7 +15,7 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
   /**
    * @var array Hooks for the plugin.
    */
-  protected $_hooks = array('install','uninstall','initialize','define_acl','admin_head');
+  protected $_hooks = array('install','uninstall','initialize','define_acl','admin_head','config','config_form');
 
   /**
    * @var array Filters for the plugin.
@@ -26,17 +26,19 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
    * @var array Options and their default values.
    */
   protected $_options = array(
-			      'flickrBackgroundErrors' => ''
+			      'flickrBackgroundErrors' => '',
+			      'flickr_api_key' => ''
 			      );
 
   /**
-   * Queue the javascript and css files to help the form work.
+   * Require the job file
    *
    * @return void
    */
   public function hookInitialize()
   {
     require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'jobs' . DIRECTORY_SEPARATOR . 'import.php';
+
   }
 
   /**
@@ -73,6 +75,7 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
   {
     queue_js_file('FlickrImport');
     queue_css_file('FlickrImport');
+       
   }
 
 
@@ -107,5 +110,21 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
     return $nav;
   }
 
+
+    /**
+     * Display the plugin config form.
+     */
+    public function hookConfigForm()
+    {
+        require dirname(__FILE__) . '/forms/config_form.php';
+    }
+
+    /**
+     * Set the options from the config form input.
+     */
+    public function hookConfig()
+    {
+        set_option('flickr_api_key', $_POST['flickr-api-key']);
+    }
     
 }

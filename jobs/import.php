@@ -15,11 +15,6 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 {
   
   /**
-   * @var string Flickr API key for this plugin
-   */
-  public static $flickr_api_key = 'a664b4fdddb9e009f43e8a6012b1a392';
-  
-  /**
    * @var string URL of flickr photo or collection to import
    */
   private $url;
@@ -84,7 +79,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 
     require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR . 'phpFlickr' . DIRECTORY_SEPARATOR . 'phpFlickr.php';
 
-    $this->f = new phpFlickr(self::$flickr_api_key);
+    $this->f = new phpFlickr(get_option('flickr_api_key'));
 
     $this->setID = $this->_parseURL();
 

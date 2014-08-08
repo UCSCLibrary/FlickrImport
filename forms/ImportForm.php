@@ -100,8 +100,8 @@ class Flickr_Form_Import extends Omeka_Form
 
         // Visibility (public vs private):
         $this->addElement('checkbox', 'flickrpublic', array(
-            'label'         => __('Privacy'),
-            'description'   => __('Please indicate whether you would like the new items to be publicly viewable on your Omeka site.'),
+            'label'         => __('Public Visibility'),
+            'description'   => __('Would you like to make the imported photo(s) public on your Omeka site?'),
             'checked'         => 'checked',
 	    'order'         => 6
 							      )
@@ -269,7 +269,7 @@ class Flickr_Form_Import extends Omeka_Form
     require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR . 'phpFlickr' . DIRECTORY_SEPARATOR . 'phpFlickr.php';
 
     //initialize a Flickr API interface with this plugin's API key
-    $f = new phpFlickr(FlickrImport_ImportJob::$flickr_api_key);
+    $f = new phpFlickr(get_option('flickr_api_key'));
 
     //pull the Flickr url from the form post 
     if(isset($_REQUEST['flickrurl']))
@@ -331,11 +331,13 @@ class Flickr_Form_Import extends Omeka_Form
    */
     private function _getCollectionOptions()
     {
+      $collectionTable = get_db()->getTable('Collection');
+      $options = $collectionTable->findPairsForSelectForm();
+      $options[0] = 'Create New Collection';
+      $options[-1] = 'Assign No Collection';
+      /*
       $collections = get_records('Collection',array(),'0');
-      $options = array(
-		       '-1'=>'Assign No Collection',
-		       '0'=>'Create New Collection'
-		       );
+
       foreach ($collections as $collection)
 	{
 	  $titles = $collection->getElementTexts('Dublin Core','Title');
@@ -343,7 +345,7 @@ class Flickr_Form_Import extends Omeka_Form
 	    $title = $titles[0];
 	  $options[$collection->id]=$title;
 	}
-
+      */
       return $options;
     }
 

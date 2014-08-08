@@ -31,6 +31,14 @@ class FlickrImport_IndexController extends Omeka_Controller_AbstractActionContro
 
     //initialize flash messenger for success or fail messages
     $flashMessenger = $this->_helper->FlashMessenger;
+
+    $flickr_api_key = get_option('flickr_api_key');
+    if(empty($flickr_api_key)) {
+      $flashMessenger->addMessage('Your Flickr API key has not been set. Please configure the FlickrImport plugin and set your API keys before attempting to import any photos.','error');
+      $this->view->form = "";
+      return;
+    }
+
     try{
       if ($this->getRequest()->isPost()){
 	if($form->isValid($this->getRequest()->getPost()))
