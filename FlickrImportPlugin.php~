@@ -124,7 +124,7 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
      */
     public function hookConfig()
     {
-        set_option('flickr-api-key', $_POST['flickr-api-key']);
+        set_option('flickr_api_key', $_POST['flickr-api-key']);
     }
     
 }

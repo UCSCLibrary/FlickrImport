@@ -9,6 +9,8 @@
 
 /**
  * FlickrImport plugin class
+ * 
+ * @package
  */
 class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
 {
@@ -38,11 +40,10 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
   public function hookInitialize()
   {
     require_once dirname(__FILE__) . DIRECTORY_SEPARATOR . 'jobs' . DIRECTORY_SEPARATOR . 'import.php';
-
   }
 
   /**
-   * Install the options
+   * Install the plugin's options
    *
    * @return void
    */
@@ -61,7 +62,6 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
     $this->_uninstallOptions();
   }
 
-
   /**
    * Queue the javascript and css files to help the form work.
    *
@@ -78,8 +78,6 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
        
   }
 
-
-
   /**
    * Define the plugin's access control list.
    *
@@ -94,7 +92,7 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
 
    
   /**
-   * Add the SedMeta link to the admin main navigation.
+   * Add the FlickrImport link to the admin main navigation.
    * 
    * @param array $nav Array of links for admin nav section
    * @return array $nav Updated array of links for admin nav section
@@ -110,7 +108,6 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
     return $nav;
   }
 
-
     /**
      * Display the plugin config form.
      */
@@ -124,7 +121,7 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
      */
     public function hookConfig()
     {
-        set_option('flickr-api-key', $_POST['flickr-api-key']);
+        set_option('flickr_api_key', $_POST['flickr-api-key']);
     }
     
 }
