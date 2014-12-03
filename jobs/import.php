@@ -74,7 +74,6 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
    */
   public function perform()
   {
-    
     Zend_Registry::get('bootstrap')->bootstrap('Acl');
 
     require_once dirname(dirname(__FILE__)) . DIRECTORY_SEPARATOR . 'libraries' . DIRECTORY_SEPARATOR . 'phpFlickr' . DIRECTORY_SEPARATOR . 'phpFlickr.php';
@@ -90,13 +89,6 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 
     $items = array();
 
-    echo("adding photos: <br>");
-    print_r($photoIDs);
-    echo("<br><br>");
-
-    echo("selected");
-    print_r($this->selected);
-
     $errorIDs = array();
     $errorMessage="";
     foreach ($photoIDs as $photoID)
@@ -104,7 +96,6 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 	try{
 	  if(!$this->selecting || isset($this->selected[$photoID]))
 	    $this->_addPhoto($photoID);
-	  echo("photo added:".$photoID);
 	} catch (Exception $e) {
 	  $errorIDs[]=$photoID;
 	  $errorMessage = $e->getMessage();
@@ -212,7 +203,10 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     if ($this->type=='photoset')
       {
 	$arr = explode('/',$this->url);
-	$setID = $arr[count($arr)-2];
+        if(substr($this->url, -1) == '/')
+            $setID = $arr[count($arr)-2];
+        else
+            $setID = $arr[count($arr)-1];
       }
     else if ($this->type=='gallery')
       {
@@ -239,16 +233,15 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
   private function _getPhotoIDs()
   {
     $ids=array();
-
     switch($this->type)
       {
       case 'photoset':
-	$list = $this->f->photosets_getPhotos($this->setID);
-	break;
+	$list = $this->f->photosets_getPhotos($this->setID);    
+        break;
 
       case 'gallery':
 	$response = $this->f->galleries_getPhotos($this->setID);
-	$list['photoset']=$response['photos'];
+	$list['photoset'] = $response['photos'];
 	break;
 	
       case 'photostream':
@@ -278,9 +271,9 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 	    $response = $this->f->urls_lookupUser($this->url);
 	    $response = $this->f->people_getPublicPhotos($response['id'],1,"",500);  
 	    $total = $response['photos']['total'];
-	    if($total > 500)
-	      echo "";
 	    $list['photoset']=$response['photos'];
+	    if($total > 300)
+                $list['photoset']=array_slice($list['photoset'],0,300);
 	  }
 
 	break;
@@ -349,10 +342,6 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
   {
     if(empty($itemID))
       throw new Exception("Unable to retrieve photo ID from Flickr. Please check your url.");
-
-    //print_r($f);
-    //echo ("<br>".$itemID);
-    //die();
 
     $response = $f->photos_getInfo($itemID);
     if(empty($response))
