@@ -108,6 +108,10 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
       $this->_handleError($error);
     }
 
+    //email user to let them know it is finished
+    $subject = "Flickr -> Omeka: Import Completed";
+    $message = "Your import from Flickr into Omeka has completed successfully. Your new items are ready to view in your Omeka dashboard. Have a nice day!";
+    mail($this->email,$subject,$message);
   }
 
   /**
