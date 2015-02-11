@@ -90,7 +90,7 @@ class FlickrImportPlugin extends Omeka_Plugin_AbstractPlugin
   public function hookDefineAcl($args)
   {
     $args['acl']->addResource('FlickrImport_Index');
-    $args['acl']->allow(null,'FlickrImport_Index');
+    $args['acl']->allow('contributor','FlickrImport_Index');
   }
 
    
