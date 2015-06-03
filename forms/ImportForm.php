@@ -108,7 +108,7 @@ class Flickr_Form_Import extends Omeka_Form
 			  );
 
 
-
+	$this->addElement('hash','csrf_token');
 
         // Submit:
         $this->addElement('submit', 'flickrimportsubmit', array(
