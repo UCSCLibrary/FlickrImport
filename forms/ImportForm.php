@@ -107,6 +107,12 @@ class Flickr_Form_Import extends Omeka_Form
 							      )
 			  );
 
+        $apiKey = get_option('flickr_api_key');
+
+        $this->addElement('hidden','apikey',array(
+            'id' =>'apikey',
+            'value' => $apiKey
+        ));
 
 	$this->addElement('hash','csrf_token');
 
@@ -235,7 +241,8 @@ class Flickr_Form_Import extends Omeka_Form
 		     'selecting'=>$selecting,
 		     'selected'=>$selected,
 		     'public'=>$public,
-		     'userRole'=>$userRole
+		     'userRole'=>$userRole,
+                     'email'=>current_user()->email
 		     );
 
 
@@ -331,21 +338,11 @@ class Flickr_Form_Import extends Omeka_Form
    */
     private function _getCollectionOptions()
     {
-      $collectionTable = get_db()->getTable('Collection');
-      $options = array('-1'=>'Create New Collection','0'=>'Assign No Collection');
-      $options = array_merge($options,$collectionTable->findPairsForSelectForm());
-      /*
-      $collections = get_records('Collection',array(),'0');
-
-      foreach ($collections as $collection)
-	{
-	  $titles = $collection->getElementTexts('Dublin Core','Title');
-	  if(isset($titles[0]))
-	    $title = $titles[0];
-	  $options[$collection->id]=$title;
-	}
-      */
-      return $options;
+        $collectionTable = get_db()->getTable('Collection');
+        $options = $collectionTable->findPairsForSelectForm();
+        $options[-1] = 'Create New Collection';
+        $options[0] = 'Assign No Collection';
+        return $options;
     }
 
   /**
@@ -413,6 +410,8 @@ class Flickr_Form_Import extends Omeka_Form
     $rv="";
     
     if (strpos($url, 'sets'))
+      $rv="photoset";
+    else if (strpos($url,'album'))
       $rv="photoset";
     else if (strpos($url,'galleries'))
       $rv="gallery";
