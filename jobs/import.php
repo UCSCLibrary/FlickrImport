@@ -93,7 +93,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 	$response = $this->f->urls_lookupUser($this->url);
 	    $this->userID = $response['id'];
 
-        if($this->collection == 0)
+        if($this->collection == -1)
             $this->collection = self::MakeDuplicateCollection($this->setID,$this->userID,$this->type,$this->f,$this->ownerRole,$this->public);
 
         $photoIDs = $this->_getPhotoIDs();
