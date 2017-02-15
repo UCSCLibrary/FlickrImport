@@ -160,7 +160,7 @@ class Flickr_Form_Import extends Omeka_Form
 	  try {
 
 	    if(self::_importSingle())
-	      return('Your image was imported into Omeka successfully');
+	      return('Import Successful. Go to Items or Collections to view imported image(s)');
 	    else
 	      throw new Exception('Import failed. You may have attempted to import a video, which are not supported.');
 
@@ -174,7 +174,7 @@ class Flickr_Form_Import extends Omeka_Form
 	try {
 
 	  if(self::_importMultiple())
-	    return('Your Flickr photoset is now being imported. This process may take a few minutes. You may continue to work while the photos are imported in the background. You may notice some strange behavior while the photos are uploading, but it will all be over soon.');
+	    return('Your Flickr photoset is now being imported. This process may take a few minutes. You may continue to work while the photos are imported in the background. You may notice some strange behavior while the photos are uploading, but it will all be over soon. In a minute, go to Items or Collections to view imported image(s).');
 
 	} catch(Exception $e) 
 	    {
