@@ -405,7 +405,8 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 		'Title'=>array($photoInfo['title']),
 		'Description'=>array($photoInfo['description']),
 		'Date'=>array($date),
-		'Rights'=>array($licenses[$photoInfo['license']])
+		'Rights'=>array($licenses[$photoInfo['license']]),
+                'Source'=>array($photoInfo['urls']['url'][0]['_content']),
 	    )
 	);
 
