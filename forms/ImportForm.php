@@ -102,7 +102,7 @@ class Flickr_Form_Import extends Omeka_Form
         $this->addElement('checkbox', 'flickrpublic', array(
             'label'         => __('Public Visibility'),
             'description'   => __('Would you like to make the imported photo(s) public on your Omeka site?'),
-            'checked'         => 'checked',
+//            'checked'         => 'checked',
 	    'order'         => 6
 							      )
 			  );
