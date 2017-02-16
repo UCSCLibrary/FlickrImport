@@ -39,43 +39,29 @@ class Flickr_Form_Import extends Omeka_Form
         //number (single or multiple):
         $this->addElement('radio', 'flickrnumber', array(
             'label'         => __('Number of Photos'),
-            'description'   => __('Please indicate whether the URL entered above points to a single image, or to a photoset or gallery containing multiple images.'),
             'value'         => 'multiple',
 	    'order'         => 1,
 	    'multiOptions'       => array(
-		'single'=>'Single Photo',
-		'multiple'=>'Multiple Photos (photoset or gallery)'
-	    )
-	)
-	);
+		'single'=>'Single Image',
+		'all'=>'All Images from a gallery, photostream, or album',
+		'select'=>'Select Images from a gallery, photostream, or album'),
+            'value' => 'single'
+	));
+
 
 
         //URL:
-        //for some reasont the zend from element "url" isn't included with Omeka
+        //for some reason the zend from element "url" isn't included with Omeka
         //so I validate with my own callback function defined below
         $this->addElement('text', 'flickrurl', array(
 	    'label'         => __('Flickr URL'),
-	    'description'   => __('Paste the full url of the photo, photoset or gallery on Flickr which you would like to import (example: https://www.flickr.com/photos/sdasmarchives/sets/72157643807500044/)'),
+	    'description'   => __('Paste the full URL of the photo, gallery, photostream, or album from Flickr'),
 	    'validators'    =>array(
 		array('callback',false,array('callback'=>array($this,'validateFlickrUrl'),'options'=>array()))
 	    ),
 	    'order'         => 2,
 	    'required'      => true,
-	    
-	)
-	);
-        //Select Items:
-        $this->addElement('radio', 'flickrselecting', array(
-            'label'         => __('Select Items'),
-            'description'   => __('If you are importing photos from a photoset or gallery, this option allows you to select which photos to import from a list of thumbnails.'),
-            'value'         => 'false',
-	    'order'         => 3,
-	    'multiOptions'       => array(
-		"false"=>"Import all items",
-		"true"=>"Select items to import"
-	    )
-	)
-	);
+	));
         
 	// Collection:
         $this->addElement('select', 'flickrcollection', array(
@@ -127,7 +113,6 @@ class Flickr_Form_Import extends Omeka_Form
 	    array(
 		'flickrurl',
 		'flickrnumber',
-		'flickrselecting',
 		'flickrcollection',
 		'flickruserrole',
 		'flickrpublic'
@@ -141,8 +126,6 @@ class Flickr_Form_Import extends Omeka_Form
 	    ), 
 	    'submit_buttons'
 	);
-	
-
     }
 
     /**
@@ -365,7 +348,7 @@ class Flickr_Form_Import extends Omeka_Form
     }
 
     /**
-     * Overrides standard omeka form behavior to fix radio display bug
+     * Overrides standard omeka form behavior to fix radio display issue
      * 
      * @return void
      */

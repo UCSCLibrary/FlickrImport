@@ -128,18 +128,28 @@ function resolveShortUrl(url){
 //Interface functions
 jQuery( document ).ready(function(){
   
+  //reset the form
+  //jQuery('body.flickr-import form')[0].reset();
+
   //If the user decides to select individual images to import from a collection,
   //parse the URL (which will initiate adding the thumbnail images to the 
   // preview div).
-  jQuery('#flickrselecting-true').click(function(e){
+//  console.log(jQuery('input#flickrnumber-select').parent()[0]);
+  jQuery('input#flickrnumber-select').click(function(e){
+    urlFieldElement = jQuery("#flickrurl").parents("div.field");
     var url = jQuery("#flickrurl").val();
+    console.log(url);
+    if (url==="")
+      return;
     if(!validFlickrUrl(url)){
       alert('Invalid Flickr Url');
       return;
     }
-    jQuery('#previewThumbs').html('');
-    jQuery('#previewThumbs').show();
-    jQuery('#previewThumbs').append('<input type="hidden" name="flickr-selecting" value="true"/><div id="previewSelectButtons"><button id="previewSelectAll">Select All</button><button id="previewDeselectAll">Deselect All</button></div>');
+    thumbs = jQuery('#previewThumbs');
+    thumbs.html('');
+    thumbs.append('<input type="hidden" name="flickr-selecting" value="true"/><div id="previewSelectButtons"><button id="previewSelectAll">Select All</button><button id="previewDeselectAll">Deselect All</button></div>');
+    thumbs.insertAfter(urlFieldElement);
+    thumbs.show();
 
     jQuery('#previewSelectAll').click(function(event){
       event.preventDefault();
@@ -158,47 +168,27 @@ jQuery( document ).ready(function(){
     parseURL(url);
   });
 
-  jQuery('#flickrselecting-false').click(function(e){
-    jQuery('#previewThumbs').hide(400);
-  });
-
   //Hide the options for selecting which images to import if you 
-  //click the import single button
+  //click the import single or import all buttons
+  jQuery('#flickrnumber-all').click(function(e){
+    jQuery('#previewThumbs').hide(400);
+  });
   jQuery('#flickrnumber-single').click(function(){
-    jQuery('#flickrselectingfield').hide(400);
     jQuery('#previewThumbs').hide(400);
   });
 
-  //Show the options for selecting which images to import if you
-  //click the import multiple button
-  jQuery('#flickrnumber-multiple').click(function(){
-    jQuery('#flickrselectingfield').show(400);
-  });
 
   //if you change the Flickr url while you are supposed to be selecting
   //which images to import, update the preview images.
   jQuery('#flickrurl').change(function(){
     var number = jQuery('input[name="flickrnumber"]:checked').val();
-    var selecting = jQuery('input[name="flickrselecting"]:checked').val();
     var url = jQuery("#flickrurl").val();
-    if(number == "multiple" && selecting == "true" && validFlickrUrl(url))
-      parseURL(url);
+    if(number == "select") {
+      if (validFlickrUrl(url))
+        parseURL(url);
+      else
+        alert('Invalid Flickr Url');
+    }
   });
-
-  //if the "import single" option is checked when the page loads 
-  //(only happens when the form repopulates after a submission)
-  //hide the item selection options.
-  var single = jQuery('input[name="flickrnumber"]:checked').val();
-  if(single=='single')
-    jQuery('#flickrselectingfield').hide();
-
-  //if the "select items to import" option is checked when the page loads 
-  //(only happens when the form repopulates after a submission)
-  //go ahead and check the other one.
-  var radios = jQuery('input[name="flickrselecting"]:checked');
-  if(radios.val()=='true')
-    jQuery('#flickrselecting-false').prop("checked",true);
-
-  jQuery('#flickrnumber-single').click();
 });
 
