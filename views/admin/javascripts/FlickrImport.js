@@ -127,16 +127,20 @@ function resolveShortUrl(url){
 
 //Interface functions
 jQuery( document ).ready(function(){
+
+  jQuery( document ).tooltip();
+
+  //reset the form (not sure why the reset function isn't working)
   jQuery('body.flickr-import div#content form input:text').val("");
   var $radios = jQuery('body.flickr-import div#content form input:radio[name=flickrnumber]');
     if($radios.is(':checked') === false) {
         $radios.filter('[value=single]').prop('checked', true);
     }
 
-  //If the user decides to select individual images to import from a collection,
-  //parse the URL (which will initiate adding the thumbnail images to the 
-  // preview div).
-//  console.log(jQuery('input#flickrnumber-select').parent()[0]);
+  //If the user decides to select individual images 
+  //to import from a collection,
+  //parse the URL (which will initiate adding the 
+  //thumbnail images to the  preview div).
   jQuery('input#flickrnumber-select').click(function(e){
     urlFieldElement = jQuery("#flickrurl").parents("div.field");
     var url = jQuery("#flickrurl").val();

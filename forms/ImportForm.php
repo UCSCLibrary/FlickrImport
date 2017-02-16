@@ -45,7 +45,8 @@ class Flickr_Form_Import extends Omeka_Form
 		'single'=>'Single Image',
 		'all'=>'All Images from a gallery, photostream, or album',
 		'select'=>'Select Images from a gallery, photostream, or album'),
-            'value' => 'single'
+            'value' => 'single',
+            'title' => 'Only the first 250 images from a gallery, photostream, or album will be imported or loaded for selection',
 	));
 
 
@@ -61,12 +62,13 @@ class Flickr_Form_Import extends Omeka_Form
 	    ),
 	    'order'         => 2,
 	    'required'      => true,
+            'title' => 'Copy the URL from your browser’s URL bar or the “share” link'
 	));
         
 	// Collection:
         $this->addElement('select', 'flickrcollection', array(
 	    'label'         => __('Collection'),
-	    'description'   => __('To which collection would you like to add the Flickr photo(s)?'),
+	    'description'   => __('To which collection would you like to add the Flickr photo(s)? <div class=tooltip>and here is a tooltip!</div>'),
 	    'value'         => '0',
 	    'order'         => 4,
 	    'multiOptions'       => $this->_getCollectionOptions()
@@ -80,7 +82,8 @@ class Flickr_Form_Import extends Omeka_Form
 	    'value'         => 'Contributor',
 	    'order'         => 5,
 	    
-	    'multiOptions'       => $this->_getRoleOptions()
+	    'multiOptions'       => $this->_getRoleOptions(),
+            'title' => 'This will determine the Dublin Core field in which the Flickr user’s name will appear.',
 	)
 	);
 
