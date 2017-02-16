@@ -139,7 +139,7 @@ class Flickr_Form_Import extends Omeka_Form
         $_REQUEST['flickrurl'] = self::_resolveShortUrl($_REQUEST['flickrurl']);
 
         //if you're importing a single photo
-        if(isset($_REQUEST['flickrnumber']) && $_REQUEST['flickrnumber']=='single')
+        if(isset($_REQUEST['flickrnumber']) && $_REQUEST['flickrnumber']==='single')
 	{
 	    try {
 
@@ -154,7 +154,7 @@ class Flickr_Form_Import extends Omeka_Form
 	}
 
         //if you're importing multiple photos
-        if(isset($_REQUEST['flickrnumber']) && $_REQUEST['flickrnumber']=='multiple')
+        if(isset($_REQUEST['flickrnumber']) && $_REQUEST['flickrnumber']!=='single')
 	    try {
 
 	        if(self::_importMultiple())
@@ -228,7 +228,6 @@ class Flickr_Form_Import extends Omeka_Form
 	    'userRole'=>$userRole,
             'email'=>current_user()->email
 	);
-
 
         //attempt to start the job
         try{
