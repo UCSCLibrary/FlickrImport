@@ -339,9 +339,9 @@ class Flickr_Form_Import extends Omeka_Form
     private function _getCollectionOptions()
     {
         $collectionTable = get_db()->getTable('Collection');
-        $options = $collectionTable->findPairsForSelectForm();
-        $options[-1] = 'Create New Collection';
-        $options[0] = 'Assign No Collection';
+        $options = ['Assign No Collection'];
+        $options = array_merge($options,$collectionTable->findPairsForSelectForm());
+
         return $options;
     }
 

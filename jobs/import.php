@@ -93,9 +93,6 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
 	$response = $this->f->urls_lookupUser($this->url);
 	    $this->userID = $response['id'];
 
-        if($this->collection == -1)
-            $this->collection = self::MakeDuplicateCollection($this->setID,$this->userID,$this->type,$this->f,$this->ownerRole,$this->public);
-
         $photoIDs = $this->_getPhotoIDs();
 
         $items = array();
@@ -481,108 +478,6 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
             $returnArray['public']="1";
 
         return($returnArray );
-
-    }
-
-
-    /**
-     *Create a new Omeka collection from a Flickr collection
-     *
-     *@param string $setID A unique identifier for the Flickr collection
-     *from which to extract metadata
-     *@param string $type The type of Flickr collection
-     *@param object $f The phpFlickr interface
-     *@param int $collection The ID of the collection to which to add the new item
-     *@param string $ownerRole The name of the dublin core field to which to 
-     *add the new omeka item or items
-     *@param boolean $public Indicates whether the new omeka item should be public
-     *@return int $id The collection ID of the newly created Omeka collection
-     */
-    public static function MakeDuplicateCollection($setID,$userID,$type='unknown',$f,$ownerRole=0,$public=1)
-    {
-        if($type=="photoset")
-        {
-	    $setInfo = $f->photosets_getInfo($setID,$userID);
-        }
-        else if ($type=="gallery")
-        {
-	    $response = $f->galleries_getInfo($setID,$userID);
-
-	    if($response['stat']=="ok")
-	        $setInfo=$response['gallery'];
-	    else
-	        throw(new Exception("Failed to retrieve gallery info from Flickr."));
-        }
-        else if ($type=="photostream")
-        {
-
-	    $response = $f->people_getInfo($userID);
-	    $setInfo=array(
-		'title'=>$response['realname']." Flickr photostream",
-		'description'=>"<p>The Flickr photostream of ".$response['realname'].", who uses the Flickr username ".$response['username']."</p><p>".$response['description']."<p>",
-		'username'=>$response['username']
-	    );
-
-        }
-
-        $maps = array(
-	    "Dublin Core"=>array(
-		'Title'=>array($setInfo['title']),
-		'Description'=>array($setInfo['description'])
-	    )
-	);
-
-        if($ownerRole > "0")
-            $maps["Dublin Core"][$ownerRole] = array($setInfo['username']);
-        
-        $Elements = array();
-
-        $db = get_db();
-        $elementTable = $db->getTable('Element');
-        
-        foreach ($maps as $elementSet=>$elements)
-        {
-	    foreach($elements as $elementName => $elementTexts)
-	    {
-	        $element = $elementTable->findByElementSetNameAndElementName($elementSet,$elementName);
-	        $elementID = $element->id;
-
-	        $Elements[$elementID] = array();
-	        foreach($elementTexts as $elementText)
-	        {
-
-		    if($elementText != strip_tags($elementText)) {
-		        //element text has html tags
-		        $text = $elementText;
-		        $html = true;
-		    }else {
-		        //plain text or other non-html object
-		        $text = $elementText;
-		        $html = false;
-		    }
-
-		    $Elements[$elementID][] = array(
-			'text' => $text,
-			'html' => $html
-		    );
-	        }
-	    }
-        }
-
-        $postArray = array('Elements'=>$Elements) ;
-        if($public)
-            $postArray['public']="1";
-
-        $record = new Collection();
-
-        $record->setPostData($postArray);
-
-        if ($record->save(false)) {
-	    // Succeed silently, since we're in the background
-        } else {
-            error_log($record->getErrors());
-        }
-        return($record->id);
 
     }
 
