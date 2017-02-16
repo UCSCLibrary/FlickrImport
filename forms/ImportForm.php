@@ -144,7 +144,7 @@ class Flickr_Form_Import extends Omeka_Form
 	    try {
 
 	        if(self::_importSingle())
-	            return('Import Successful. Go to Items or Collections to view imported image(s)');
+	            return('Go to Items or Collections to view imported image(s)');
 	        else
 	            throw new Exception('Import failed. You may have attempted to import a video, which are not supported.');
 

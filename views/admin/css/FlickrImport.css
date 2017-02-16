@@ -29,6 +29,15 @@
     overflow: hidden;
 }
 
+.flickr-success-dialog {
+    font-size: 2em;
+    border: 2px solid green;
+}
+
+#flickr-success-dialog{
+    padding: 0px;
+}
+
 #flickrimportsubmit {
 clear:both;
 display:block;
