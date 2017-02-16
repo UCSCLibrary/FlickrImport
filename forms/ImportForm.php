@@ -195,13 +195,10 @@ class Flickr_Form_Import extends Omeka_Form
         else
             $collection = 0;
 
-        if(isset($_REQUEST['flickrselecting'])&&$_REQUEST['flickrselecting']=="true")
-        {
+        if(isset($_REQUEST['flickr-selecting'])) {
 	    $selecting = true;
 	    $selected = $_REQUEST['flickr-selected'];
-        } 
-        else 
-        {
+        } else {
 	    $selecting = false;
 	    $selected = array();
         }
