@@ -127,9 +127,11 @@ function resolveShortUrl(url){
 
 //Interface functions
 jQuery( document ).ready(function(){
-  
-  //reset the form
-  //jQuery('body.flickr-import form')[0].reset();
+  jQuery('body.flickr-import div#content form input:text').val("");
+  var $radios = jQuery('body.flickr-import div#content form input:radio[name=flickrnumber]');
+    if($radios.is(':checked') === false) {
+        $radios.filter('[value=single]').prop('checked', true);
+    }
 
   //If the user decides to select individual images to import from a collection,
   //parse the URL (which will initiate adding the thumbnail images to the 
