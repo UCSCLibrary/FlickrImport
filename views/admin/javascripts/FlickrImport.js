@@ -1,3 +1,5 @@
+
+//TODO no more javascript global variables
 var flickr_preview_pagesize = 25;
 var flickr_preview_photos; 
 var flickr_current_page;
@@ -157,7 +159,7 @@ jQuery( document ).ready(function(){
 
   jQuery( document ).tooltip();
 
-  jQuery('div#flickr-preview').append('<input type="hidden" name="flickr-selecting" value="true"/><div id="previewSelectButtons"><button id="previewSelectAll">Select All</button><button id="previewDeselectAll">Deselect All</button></div><div id="flickr-thumbs"></div><div id=preview-pagination><a id="flickr-preview-page-prev">&#60;</a><div id=page-numbers></div><a id="flickr-preview-page-next">&#62;</a></div><div id=preview-per-page>Per Page: <input type=text name=flickr-perpage size=4 id="flickr-perpage-input"></div>');
+  jQuery('div#flickr-preview').append('<h3>Select images to import</h3><input type="hidden" name="flickr-selecting" value="true"/><div id="previewSelectButtons"><button id="previewSelectAll">Select All</button><button id="previewDeselectAll">Deselect All</button></div><div id="flickr-thumbs"></div><div id=preview-pagination><a id="flickr-preview-page-prev">&#60;</a><div id=page-numbers></div><a id="flickr-preview-page-next">&#62;</a></div><div id=preview-per-page>Per Page: <input type=text name=flickr-perpage size=4 id="flickr-perpage-input"></div>');
 
   //reset the form (not sure why the reset function isn't working)
   jQuery('body.flickr-import div#content form input:text').val("");
@@ -173,11 +175,6 @@ jQuery( document ).ready(function(){
     showPage(newPage);
   });
 
-/*  var $radios = jQuery('body.flickr-import div#content form input:radio[name=flickrnumber]');
-    if($radios.is(':checked') === false) {
-        $radios.filter('[value=single]').prop('checked', true);
-    }
-*/
 
   //If the user decides to select individual images 
   //to import from a collection,

@@ -32,11 +32,11 @@ div#flickr-preview::after {
 #flickr-preview {
     border: 1px solid black;
     display:none;
+    text-align: center;
 }
 
 #flickr-preview #preview-pagination {
     clear: both;
-    margin-left: 40%;
 }
 
 #flickr-preview #preview-pagination #page-numbers{
@@ -54,10 +54,6 @@ div#flickr-preview::after {
     padding-right:5px;
     padding-bottom:15px;
     display:inline;
-}
-
-#flickr-preview #preview-per-page {
-    margin-left:30%
 }
 
 .previewLabel {
