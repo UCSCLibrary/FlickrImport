@@ -1,4 +1,4 @@
-var flickr_preview_pagesize = 20;
+var flickr_preview_pagesize = 25;
 var flickr_preview_photos; 
 var flickr_current_page;
 var flickr_selected;
@@ -113,7 +113,7 @@ function showPage(pagenum,pagesize = false) {
  *Flickr photoID and adds them with a checkbox to the photo
  *preview div
  */
-function addPhotos(index=0,end=20){
+function addPhotos(index,end){
   if(index >= end)
     return;
   var urlBase = "https://api.flickr.com/services/rest/?api_key=a664b4fdddb9e009f43e8a6012b1a392&format=json&jsoncallback=?&method=flickr.photos.getSizes&photo_id=";
