@@ -18,8 +18,46 @@
     text-align: center;
 }
 
-#previewThumbs {
-    border: 1pm solid black;
+div#previewThumbs {
+    height: 100%;
+    border: 1px solid black;
+}
+
+div#flickr-preview::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+#flickr-preview {
+    border: 1px solid black;
+    display:none;
+}
+
+#flickr-preview #preview-pagination {
+    clear: both;
+    margin-left: 40%;
+}
+
+#flickr-preview #preview-pagination #page-numbers{
+    display:inline;
+}
+
+#flickr-preview #preview-pagination #page-numbers a {
+    padding-left:5px;
+    padding-right:5px;
+    padding-bottom:15px;
+}
+
+#flickr-preview #preview-pagination #page-numbers div {
+    padding-left:5px;
+    padding-right:5px;
+    padding-bottom:15px;
+    display:inline;
+}
+
+#flickr-preview #preview-per-page {
+    margin-left:30%
 }
 
 .previewLabel {

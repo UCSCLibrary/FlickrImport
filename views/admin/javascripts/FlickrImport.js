@@ -1,9 +1,13 @@
+var flickr_preview_pagesize = 20;
+var flickr_preview_photos; 
+var flickr_current_page;
+var flickr_selected;
 
 /**
  *This function parses the provided flickr url to distinguish between
  *photosets, galleries, and photostreams. It grabs the identifying
  *string for the appropriate collection type. When finished, it calls
- *getPhotoIDs.
+ *previewPhotos.
  */
 function parseURL(url,userID){
   apikey = jQuery("input#apikey").val();
@@ -22,18 +26,18 @@ function parseURL(url,userID){
       var glpurl = "https://api.flickr.com/services/rest/?api_key="+apikey+"&format=json&jsoncallback=?&method=flickr.urls.lookupGallery&url="+encodeURIComponent(url);
       jQuery.getJSON( glpurl , {format: "json"})
         .done(function( msg ) {
-	  getPhotoIDs(msg.gallery.id,userID,"gallery");
+	  previewPhotos(msg.gallery.id,userID,"gallery");
         });
 
       //photoset
     } else if (galSplit.length ==1 && setSplit.length > 1) {
       var setID = setSplit[setSplit.length-1];
       setID = setID.replace(/\//g,"");
-      getPhotoIDs(setID,userID,"photoset");
+      previewPhotos(setID,userID,"photoset");
 
       //photostream
     } else if (galSplit.length==1 && setSplit.length ==1) {
-      getPhotoIDs(false,userID,"photostream");
+      previewPhotos(false,userID,"photostream");
     }
 
   } else {
@@ -46,18 +50,14 @@ function parseURL(url,userID){
   }
 }
 
-function getUserID(url){
-}
-
 /*
- *This function returns an array of photoIDs contained within
- *the given Flickr collection. It takes one parameter which is
- *an array containing the identifying string for the collection
- *and the collection type.
+ *This function retrieves a list of photos in the given set
+ * and calls the addPhotos function to generate a preview
+ * of them, paginated as necessary.
  *When finished, this function calls addPhoto, which adds the
  *photo to the preview div.
  */
-function getPhotoIDs(setID,userID,type){
+function previewPhotos(setID,userID,type){
   var apikey = jQuery('input#apikey').val();
   var apiBase = "https://api.flickr.com/services/rest/?api_key="+apikey+"&format=json&jsoncallback=?&method=flickr.";
 
@@ -67,17 +67,45 @@ function getPhotoIDs(setID,userID,type){
     url = apiBase+"photosets.getPhotos&photoset_id="+setID;
   else if (type == "photostream")
     url = apiBase+"people.getPublicPhotos";
+  else 
+    return;
   
   url += "&user_id="+userID;
   jQuery.getJSON( url , {format: "json"})
     .done(function( msg ) {
-      if(type=="gallery")
-	addPhoto(msg.photos.photo,0);
-      else if (type=="photoset")
-	addPhoto(msg.photoset.photo,0);    
-      else if (type=="photostream")
-	addPhoto(msg.photos.photo,0);
+      flickr_preview_photos = (type == 'photoset') ? msg.photoset.photo : msg.photos.photo;
+      showPage(1);
     });    
+}
+
+function resetPageButtons(numpages,currentPage=1) {
+  var id;
+  jQuery('#flickr-preview #page-numbers > a').remove();
+  jQuery('#flickr-preview #page-numbers > div').remove();
+  for (var page = 1; page <= numpages; page++) {
+    id = 'flickr-preview-page-'+page;
+    if (page == currentPage) 
+      jQuery('#flickr-preview #page-numbers').append('<div id="'+id+'">'+page+'</div>');
+    else
+      jQuery('#flickr-preview #page-numbers').append('<a id="'+id+'">'+page+'</a>');
+    
+    jQuery('#flickr-preview #'+id).click(function(){
+      jQuery('#flickr-preview a').unbind();
+      showPage(parseInt(jQuery(this).html()));
+    });
+  }
+}
+
+
+function showPage(pagenum,pagesize = false) {
+  if(pagesize === false)
+    pagesize = flickr_preview_pagesize;
+  var numPages = Math.ceil(flickr_preview_photos.length / pagesize);
+  resetPageButtons(numPages,pagenum);
+  jQuery('div.previewPicDiv').remove()  
+  start = (pagenum-1)*pagesize;
+  flickr_current_page = pagenum;
+  addPhotos(start,start+pagesize);
 }
 
 /*
@@ -85,20 +113,20 @@ function getPhotoIDs(setID,userID,type){
  *Flickr photoID and adds them with a checkbox to the photo
  *preview div
  */
-function addPhoto(photos,i){
-
+function addPhotos(index=0,end=20){
+  if(index >= end)
+    return;
   var urlBase = "https://api.flickr.com/services/rest/?api_key=a664b4fdddb9e009f43e8a6012b1a392&format=json&jsoncallback=?&method=flickr.photos.getSizes&photo_id=";
 
-  var htmlBegin = '<div class="previewPicDiv"><input type="checkbox" name="flickr-selected['+photos[i].id+']" class="previewCheck" /><img class="previewPic" src="';
+  var htmlBegin = '<div class="previewPicDiv"><input type="checkbox" name="flickr-selected['+flickr_preview_photos[index].id+']" class="previewCheck" /><img class="previewPic" src="';
   var htmlMiddle = '" ><label class="previewLabel">';
   var htmlEnd = "</previewLabel></div>";
 
-  jQuery.getJSON( urlBase+photos[i].id , {format: "json"})
+  jQuery.getJSON( urlBase+flickr_preview_photos[index].id , {format: "json"})
     .done(function( msg ) {
-      jQuery('#previewThumbs').append(htmlBegin+msg.sizes.size[2].source+htmlMiddle+photos[i].title+htmlEnd);
-      addPhoto(photos,++i);
+      jQuery('#flickr-preview #flickr-thumbs').append(htmlBegin+msg.sizes.size[2].source+htmlMiddle+flickr_preview_photos[index].title+htmlEnd);
+      addPhotos(++index,end);
     }); 
-
 }
 
 /*
@@ -124,18 +152,32 @@ function resolveShortUrl(url){
     return url;
 }
 
-
 //Interface functions
 jQuery( document ).ready(function(){
 
   jQuery( document ).tooltip();
 
+  jQuery('div#flickr-preview').append('<input type="hidden" name="flickr-selecting" value="true"/><div id="previewSelectButtons"><button id="previewSelectAll">Select All</button><button id="previewDeselectAll">Deselect All</button></div><div id="flickr-thumbs"></div><div id=preview-pagination><a id="flickr-preview-page-prev">&#60;</a><div id=page-numbers></div><a id="flickr-preview-page-next">&#62;</a></div><div id=preview-per-page>Per Page: <input type=text name=flickr-perpage size=4 id="flickr-perpage-input"></div>');
+
   //reset the form (not sure why the reset function isn't working)
   jQuery('body.flickr-import div#content form input:text').val("");
-  var $radios = jQuery('body.flickr-import div#content form input:radio[name=flickrnumber]');
+
+  //set the default max responses per page
+  jQuery("#flickr-perpage-input").val(flickr_preview_pagesize);
+
+  //trigger reload images on per-page change
+  jQuery("#preview-per-page").change(function(){
+    var newPageSize = parseInt(jQuery("#flickr-perpage-input").val());
+    var newPage = Math.floor(flickr_current_page * flickr_preview_pagesize / newPageSize);
+    flickr_preview_pagesize = newPageSize;
+    showPage(newPage);
+  });
+
+/*  var $radios = jQuery('body.flickr-import div#content form input:radio[name=flickrnumber]');
     if($radios.is(':checked') === false) {
         $radios.filter('[value=single]').prop('checked', true);
     }
+*/
 
   //If the user decides to select individual images 
   //to import from a collection,
@@ -144,16 +186,13 @@ jQuery( document ).ready(function(){
   jQuery('input#flickrnumber-select').click(function(e){
     urlFieldElement = jQuery("#flickrurl").parents("div.field");
     var url = jQuery("#flickrurl").val();
-    console.log(url);
     if (url==="")
       return;
     if(!validFlickrUrl(url)){
       alert('Invalid Flickr Url');
       return;
     }
-    thumbs = jQuery('#previewThumbs');
-    thumbs.html('');
-    thumbs.append('<input type="hidden" name="flickr-selecting" value="true"/><div id="previewSelectButtons"><button id="previewSelectAll">Select All</button><button id="previewDeselectAll">Deselect All</button></div>');
+    thumbs = jQuery('#flickr-preview');
     thumbs.insertAfter(urlFieldElement);
     thumbs.show();
 
@@ -177,10 +216,10 @@ jQuery( document ).ready(function(){
   //Hide the options for selecting which images to import if you 
   //click the import single or import all buttons
   jQuery('#flickrnumber-all').click(function(e){
-    jQuery('#previewThumbs').hide(400);
+    jQuery('#flickr-preview').hide(400);
   });
   jQuery('#flickrnumber-single').click(function(){
-    jQuery('#previewThumbs').hide(400);
+    jQuery('#flickr-preview').hide(400);
   });
 
 

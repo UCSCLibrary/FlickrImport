@@ -68,7 +68,7 @@ class Flickr_Form_Import extends Omeka_Form
 	// Collection:
         $this->addElement('select', 'flickrcollection', array(
 	    'label'         => __('Collection'),
-	    'description'   => __('To which collection would you like to add the Flickr photo(s)? <div class=tooltip>and here is a tooltip!</div>'),
+	    'description'   => __('To which collection would you like to add the Flickr photo(s)?'),
 	    'value'         => '0',
 	    'order'         => 4,
 	    'multiOptions'       => $this->_getCollectionOptions()
@@ -363,7 +363,7 @@ class Flickr_Form_Import extends Omeka_Form
 		    array('HtmlTag',array(
 			'tag'=>'div',
 			'placement' => Zend_Form_Decorator_Abstract::PREPEND,
-			'id'=>"previewThumbs",
+			'id'=>"flickr-preview",
 			'class'=>"field"
 		    )
 		    )
