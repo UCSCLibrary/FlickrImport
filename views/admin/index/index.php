@@ -5,21 +5,9 @@ $head = array('bodyclass' => 'flickr-import',
 echo head($head);
 echo flash(); 
 
-if(isset($successDialog)) {
-  ?>
-  <div id="flickr-success-dialog" title="&#x2714; SUCCESS"></div>
-  <script>
-   jQuery( function() {
-       jQuery( "#flickr-success-dialog" ).dialog({
-           height: 0,
-           width: 250,
-           resizeable: false,
-           dialogClass: "flickr-success-dialog"
-       });
-   } );
-  </script>
-  <?php
-}
+if(isset($successDialog)) 
+  echo '<div id="flickr-success-dialog" title="&#x2714; SUCCESS"></div>';
+
 echo $form; 
 echo foot(); 
 
