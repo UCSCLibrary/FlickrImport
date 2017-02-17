@@ -157,7 +157,14 @@ function resolveShortUrl(url){
 //Interface functions
 jQuery( document ).ready(function(){
 
-  jQuery( document ).tooltip();
+  jQuery("body.flickr-import form").tooltip();
+
+  jQuery( "body.flickr-import #flickr-success-dialog" ).dialog({
+    height: 0,
+    width: 250,
+    resizeable: false,
+    dialogClass: "flickr-success-dialog"
+  });
 
   jQuery('div#flickr-preview').append('<h3>Select images to import</h3><input type="hidden" name="flickr-selecting" value="true"/><div id="previewSelectButtons"><button id="previewSelectAll">Select All</button><button id="previewDeselectAll">Deselect All</button></div><div id="flickr-thumbs"></div><div id=preview-pagination><a id="flickr-preview-page-prev">&#60;</a><div id=page-numbers></div><a id="flickr-preview-page-next">&#62;</a></div><div id=preview-per-page>Per Page: <input type=text name=flickr-perpage size=4 id="flickr-perpage-input"></div>');
 
