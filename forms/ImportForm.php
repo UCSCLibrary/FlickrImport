@@ -32,10 +32,6 @@ class Flickr_Form_Import extends Omeka_Form
     private function _registerElements()
     {
 
-        //hashed anti-csrf nonce:
-        //$this->addElement('hash', 'flickrNonce', array('salt'=>'oilyravinecakes'));
-        
-        
         //number (single or multiple):
         $this->addElement('radio', 'flickrnumber', array(
             'label'         => __('Number of Photos'),
@@ -48,8 +44,6 @@ class Flickr_Form_Import extends Omeka_Form
             'value' => 'single',
             'title' => 'Only the first 250 images from a gallery, photostream, or album will be imported or loaded for selection',
 	));
-
-
 
         //URL:
         //for some reason the zend from element "url" isn't included with Omeka
@@ -84,32 +78,32 @@ class Flickr_Form_Import extends Omeka_Form
 	    
 	    'multiOptions'       => $this->_getRoleOptions(),
             'title' => 'This will determine the Dublin Core field in which the Flickr user’s name will appear.',
-	)
-	);
+	));
 
+        // Import Tags (yes or no):
+        $this->addElement('checkbox', 'flickrtags', array(
+            'label'         => __('Flickr Tags'),
+            'description'   => __('Import the user-created Flickr tags associated with the imported photo(s)?'),
+	    'order'         => 6
+        ));
 
         // Visibility (public vs private):
         $this->addElement('checkbox', 'flickrpublic', array(
             'label'         => __('Public Visibility'),
             'description'   => __('Would you like to make the imported photo(s) public on your Omeka site?'),
             //            'checked'         => 'checked',
-	    'order'         => 6
-	)
-	);
-
-        $apiKey = get_option('flickr_api_key');
+	    'order'         => 7
+	));
 
         $this->addElement('hidden','apikey',array(
             'id' =>'apikey',
-            'value' => $apiKey
-        ));
+            'value' => get_option('flickr_api_key')));
 
 	$this->addElement('hash','csrf_token');
 
         // Submit:
         $this->addElement('submit', 'flickrimportsubmit', array(
-            'label' => __('Import Photo(s)')
-        ));
+            'label' => __('Import Photo(s)')));
 
 	//Display Groups:
         $this->addDisplayGroup(
@@ -118,10 +112,10 @@ class Flickr_Form_Import extends Omeka_Form
 		'flickrnumber',
 		'flickrcollection',
 		'flickruserrole',
+                'flickrtags',
 		'flickrpublic'
 	    ),
-	    'fields'
-	);
+	    'fields');
 	
         $this->addDisplayGroup(
 	    array(
@@ -159,10 +153,8 @@ class Flickr_Form_Import extends Omeka_Form
         //if you're importing multiple photos
         if(isset($_REQUEST['flickrnumber']) && $_REQUEST['flickrnumber']!=='single')
 	    try {
-
 	        if(self::_importMultiple())
 	            return('Your Flickr photoset is now being imported. This process may take a few minutes. You may continue to work while the photos are imported in the background. You may notice some strange behavior while the photos are uploading, but it will all be over soon. In a minute, go to Items or Collections to view imported image(s).');
-
 	    } catch(Exception $e) 
 	{
 	    throw new Exception('Error initializing photo import: '.$e->getMessage());
@@ -192,30 +184,18 @@ class Flickr_Form_Import extends Omeka_Form
         //parse the type
         $type = self::_getType($_REQUEST['flickrurl']);
 
+
+
+
         //process optional values
-        if(isset($_REQUEST['flickrcollection']))
-            $collection = $_REQUEST['flickrcollection'];
-        else
-            $collection = 0;
-
-        if(isset($_REQUEST['flickr-selecting'])) {
-	    $selecting = true;
-	    $selected = $_REQUEST['flickr-selected'];
-        } else {
-	    $selecting = false;
-	    $selected = array();
-        }
-
-        if(isset($_REQUEST['flickrpublic']))
-            $public = $_REQUEST['flickrpublic'];
-        else 
-            $public = false;
 
 
-        if(isset($_REQUEST['flickruserrole']))
-            $userRole = $_REQUEST['flickruserrole'];
-        else
-            $userRole = 0;
+        $collection = isset($_REQUEST['flickrcollection']) ? $_REQUEST['flickrcollection']: 0;
+        $public = isset($_REQUEST['flickrpublic']) ? $_REQUEST['flickrpublic'] : false;
+        $tags = isset($_REQUEST['flickrtags']) ? $_REQUEST['flickrtags'] : false;
+        $userRole = $_REQUEST['flickruserrole'] ? $_REQUEST['flickruserrole'] : 0;
+        $selecting = (bool) $_REQUEST['flickr-selecting'];
+        $selected = $selecting ? $_REQUEST['flickr-selected'] : array();
 
         //set up options to pass to background job
         $options = array(
@@ -226,7 +206,8 @@ class Flickr_Form_Import extends Omeka_Form
 	    'selected'=>$selected,
 	    'public'=>$public,
 	    'userRole'=>$userRole,
-            'email'=>current_user()->email
+            'email'=>current_user()->email,
+            'includeTags'=>$tags
 	);
 
         //attempt to start the job
@@ -269,24 +250,15 @@ class Flickr_Form_Import extends Omeka_Form
 
         $photoID = self::_parsePhotoUrl($url);
 
-        if(isset($_REQUEST['flickrcollection']))
-            $collection = $_REQUEST['flickrcollection'];
-        else
-            $collection = 0;
-
-        if(isset($_REQUEST['flickrpublic']))
-            $public = $_REQUEST['flickrpublic'];
-        else 
-            $public = false;
-
-        if(isset($_REQUEST['flickruserrole']))
-            $userRole = $_REQUEST['flickruserrole'];
-        else
-            $userRole = 0;
+        
+        $collection = isset($_REQUEST['flickrcollection']) ? $_REQUEST['flickrcollection']: 0;
+        $public = isset($_REQUEST['flickrpublic']) ? $_REQUEST['flickrpublic'] : false;
+        $tags = isset($_REQUEST['flickrtags']) ? $_REQUEST['flickrtags'] : false;
+        $userRole = $_REQUEST['flickruserrole'] ? $_REQUEST['flickruserrole'] : 0;
 
         try{
             //retrive the photo information in the correct format to create a new Omeka item
-            $post = FlickrImport_ImportJob::GetPhotoPost($photoID,$f,$collection,$userRole,$public);
+            $post = FlickrImport_ImportJob::GetPhotoPost($photoID,$f,$collection,$userRole,$public,$tags);
 
             //retrieve the files associated with this photo (the photo itself, mainly)
             //in the correct format to attach to an omeka item

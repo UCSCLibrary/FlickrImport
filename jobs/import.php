@@ -151,6 +151,18 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     }
 
     /**
+     *Set the whether to include tags from flickr as omeka tags
+     *
+     *@param boolean $includeTags true to include flickr tags, false not to
+     * to add the photos
+     *@return null
+     */
+    public function setIncludeTags($includeTags)
+    {
+        $this->includeTags = $includeTags;
+    }
+
+    /**
      *Set the selected array
      *
      *@param array $selected An array containing the photoIDs of Flickr 
@@ -354,7 +366,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
      *@return array $post An array containing metadata associated with the 
      *given Flickr photo in the correct format to save as an omeka item
      */
-    public static function GetPhotoPost($itemID,$f,$collection=0,$ownerRole="Contributor",$public=false)
+    public static function GetPhotoPost($itemID,$f,$collection=0,$ownerRole="Contributor",$public=false,$includeTags=false)
     {
         if(empty($itemID))
             throw new Exception("Unable to retrieve photo ID from Flickr. Please check your url.");
@@ -456,13 +468,13 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
         }
 
         $tags = "";
-        foreach($photoInfo['tags']['tag'] as $tag)
-        {
-	    $tags .= $tag['raw'];
-	    $tags .=",";
+        if($includeTags) {
+            foreach($photoInfo['tags']['tag'] as $tag){
+	        $tags .= $tag['raw'];
+	        $tags .=",";
+            }
+            $tags = substr($tags,0,-2);
         }
-
-        $tags = substr($tags,0,-2);
 
         $returnArray = array(
 	    'Elements'=>$Elements,
@@ -490,7 +502,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     private function _addPhoto($itemID)
     {
         try{
-            $post = self::GetPhotoPost($itemID,$this->f,$this->collection,$this->ownerRole,$this->public);
+            $post = self::GetPhotoPost($itemID,$this->f,$this->collection,$this->ownerRole,$this->public,$this->includeTags);
             
             $files = self::GetPhotoFiles($itemID,$this->f);
         } catch(Exception $e) {
