@@ -370,8 +370,6 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
         if(empty($itemID))
             throw new Exception("Unable to retrieve photo ID from Flickr. Please check your url.");
 
-//        die('item id:'.$itemID);
-
         $response = $f->photos_getInfo($itemID);
         if(empty($response))
             $response['stat']="no response";
