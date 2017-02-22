@@ -101,8 +101,7 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
         $errorMessage="";
         foreach ($photoIDs as $photoID)
         {
-	    try{
-	        if(!$this->selecting || isset($this->selected[$photoID]))
+	    try{	        if(!$this->selecting || isset($this->selected[$photoID]))
 	            $this->_addPhoto($photoID);
 	    } catch (Exception $e) {
 	        $errorIDs[]=$photoID;
@@ -370,6 +369,8 @@ class FlickrImport_ImportJob extends Omeka_Job_AbstractJob
     {
         if(empty($itemID))
             throw new Exception("Unable to retrieve photo ID from Flickr. Please check your url.");
+
+//        die('item id:'.$itemID);
 
         $response = $f->photos_getInfo($itemID);
         if(empty($response))

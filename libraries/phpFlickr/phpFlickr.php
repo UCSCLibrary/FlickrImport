@@ -56,7 +56,9 @@ if ( !class_exists('phpFlickr') ) {
 	var $max_cache_rows = 1000;
 
         //added to fix warning in PHP7
-        public function __construct(){echo "phpFlickr constructor\n";}
+        public function __construct($api_key, $secret = NULL, $die_on_error = false) {
+            return $this->phpFlickr ($api_key, $secret, $die_on_error);
+        }
 
 	function phpFlickr ($api_key, $secret = NULL, $die_on_error = false) {
 	    //The API Key must be set before any calls can be made.  You can
